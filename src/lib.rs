@@ -16,45 +16,33 @@ use std::borrow::*;
 
 thread_local!{
     static GAME_STATE: RefCell<GameState> = RefCell::new(GameState::new());
-    static CONTROLLER_STATE: RefCell<bool> = RefCell::new(false);
+    static CONTROLLER_STATE: RefCell<ControllerState> = RefCell::new(ControllerState::new());
 }
 
 #[no_mangle]
 fn update() {
     unsafe { *DRAW_COLORS = 0x1234 }
 
-    let gamepad = unsafe { *GAMEPAD1 };
-    let mut direction: Option<Direction> = None;
+    let mut controller_events: Vec<ControllerEvent> = Vec::<ControllerEvent>::new();
 
     CONTROLLER_STATE.with(|state| {
+
         let mut state = state.borrow_mut();
-        match gamepad {
-            x if x & BUTTON_UP != 0 => direction = Some(Direction::Down),
-            x if x & BUTTON_DOWN != 0 => direction = Some(Direction::Up),
-            x if x & BUTTON_LEFT != 0 => direction = Some(Direction::Right),
-            x if x & BUTTON_RIGHT != 0 => direction = Some(Direction::Left),
-            _ => direction = None,
-        }
-        if direction != None && *state != true {
-            trace("Button down");
-            *state = true;
-        }
-        else if direction != None && *state == true {
-            direction = None;
-        }
-        else if direction == None && *state == true {
-            trace("Button up");
-            *state = false;
-            direction = None;
-        }
+
+        controller_events = state.get_event();
     });
 
     GAME_STATE.with(|state| {
-        let mut stateRef = &mut state.borrow_mut();
+        let stateRef = &mut state.borrow_mut();
 
-        if direction != None {
-            trace("Moving");
-            stateRef.move_space(direction.unwrap());
+        for event in controller_events {
+            match event {
+                ControllerEvent::Pressed(Buttons::Up) => stateRef.move_space(Direction::Down),
+                ControllerEvent::Pressed(Buttons::Down) => stateRef.move_space(Direction::Up),
+                ControllerEvent::Pressed(Buttons::Left) => stateRef.move_space(Direction::Right),
+                ControllerEvent::Pressed(Buttons::Right) => stateRef.move_space(Direction::Left),
+                _ => (),
+            }
         }
 
         draw(&stateRef);
