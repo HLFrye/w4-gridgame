@@ -1,5 +1,5 @@
 fn generate_board() -> Vec<u8> {
-    return vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+    return vec![2, 4, 9, 16, 6, 14, 11, 15, 8, 7, 5, 12, 13, 3, 10, 1];
 }
 
 #[derive(PartialEq)]

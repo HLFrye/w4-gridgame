@@ -4,10 +4,12 @@ mod wasm4;
 mod tiles;
 mod gamestate;
 mod drawing;
+mod input;
 
 use wasm4::*;
 use gamestate::*;
 use drawing::*;
+use input::*;
 
 use core::cell::RefCell;
 use std::borrow::*;
