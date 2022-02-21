@@ -10,14 +10,9 @@ pub enum Direction {
     Right,
 }
 
-enum GameScene {
-    Playing
-}
-
 pub struct GameState {
     board: Vec<u8>,
     move_count: u32,
-    scene: GameScene,
 }
 
 impl GameState {
@@ -25,7 +20,6 @@ impl GameState {
         GameState {
             board: generate_board(),
             move_count: 0,
-            scene: GameScene::Playing,
         }
     }
 
@@ -35,7 +29,7 @@ impl GameState {
 
     pub fn move_space(&mut self, dir: Direction) {
         // find the x, y of the 0
-        let index = self.board.iter().position(|&r| r == 15).unwrap();
+        let index = self.board.iter().position(|&r| r == 16).unwrap();
 
         let mut x = index % 4;
         let mut y = index / 4;

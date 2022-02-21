@@ -26,7 +26,7 @@ pub fn draw(state: &GameState) {
         let x: i32 = 8 + (36 * (i % 4));
         let y: i32 = 8 + (36 * (i / 4));
         let value = state.get_value(i);
-        if value < 15 {
+        if value < 16 {
             blit(TILES[value as usize], x, y, 36, 36, BLIT_2BPP);
         }
     }
