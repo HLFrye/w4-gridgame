@@ -1,8 +1,6 @@
-pub trait Scene {
-    pub fn handle_input(&mut self, event: ControllerEvent) -> Option<Scene>
-    pub fn render(&self)
-}
+use crate::ControllerEvent;
 
-pub struct MainGameScene {
-    
+pub trait Scene {
+    fn handle_input(&mut self, event: ControllerEvent) -> Option<Box<dyn Scene>>;
+    fn render(&self);
 }

@@ -5,17 +5,17 @@ mod tiles;
 mod gamestate;
 mod drawing;
 mod input;
+mod scene;
 
 use wasm4::*;
 use gamestate::*;
-use drawing::*;
 use input::*;
+use scene::*;
 
 use core::cell::RefCell;
-use std::borrow::*;
 
 thread_local!{
-    static GAME_STATE: RefCell<GameState> = RefCell::new(GameState::new());
+    static SCENE: RefCell<MainGameScene> = RefCell::new(MainGameScene::new());
     static CONTROLLER_STATE: RefCell<ControllerState> = RefCell::new(ControllerState::new());
 }
 
@@ -32,20 +32,13 @@ fn update() {
         controller_events = state.get_event();
     });
 
-    GAME_STATE.with(|state| {
-        let stateRef = &mut state.borrow_mut();
-
+    SCENE.with(|scene| {
+        let mut scene = scene.borrow_mut();
         for event in controller_events {
-            match event {
-                ControllerEvent::Pressed(Buttons::Up) => stateRef.move_space(Direction::Down),
-                ControllerEvent::Pressed(Buttons::Down) => stateRef.move_space(Direction::Up),
-                ControllerEvent::Pressed(Buttons::Left) => stateRef.move_space(Direction::Right),
-                ControllerEvent::Pressed(Buttons::Right) => stateRef.move_space(Direction::Left),
-                _ => (),
-            }
+            scene.handle_input(event);
         }
 
-        draw(&stateRef);
+        scene.render();
     });
 }
 

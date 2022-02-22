@@ -1,3 +1,9 @@
+use crate::tiles::*;
+use crate::wasm4::*;
+use crate::scene::*;
+use crate::input::*;
+use crate::ControllerEvent;
+
 fn generate_board() -> Vec<u8> {
     return vec![2, 4, 9, 16, 6, 14, 11, 15, 8, 7, 5, 12, 13, 3, 10, 1];
 }
@@ -10,16 +16,18 @@ pub enum Direction {
     Right,
 }
 
-pub struct GameState {
+pub struct MainGameScene {
     board: Vec<u8>,
     move_count: u32,
+    show_hint: bool,
 }
 
-impl GameState {
-    pub fn new() -> GameState {
-        GameState {
+impl MainGameScene {
+    pub fn new() -> MainGameScene {
+        MainGameScene {
             board: generate_board(),
             move_count: 0,
+            show_hint: false,
         }
     }
 
@@ -48,5 +56,54 @@ impl GameState {
         // swap old and new pos
         let newIndex = y * 4 + x;
         self.board.swap(index, newIndex);
+    }
+}
+
+const TILES: [&[u8]; 16] = [
+    &tile1_bits,
+    &tile2_bits,
+    &tile3_bits,
+    &tile4_bits,
+    &tile5_bits,
+    &tile6_bits,
+    &tile7_bits,
+    &tile8_bits,
+    &tile9_bits,
+    &tile10_bits,
+    &tile11_bits,
+    &tile12_bits,
+    &tile13_bits,
+    &tile14_bits,
+    &tile15_bits,
+    &tile16_bits,
+];
+
+impl Scene for MainGameScene {
+    fn handle_input(&mut self, event: ControllerEvent) -> Option<Box<dyn Scene>> {
+        match event {
+            ControllerEvent::Pressed(Buttons::Up) => self.move_space(Direction::Down),
+            ControllerEvent::Pressed(Buttons::Down) => self.move_space(Direction::Up),
+            ControllerEvent::Pressed(Buttons::Left) => self.move_space(Direction::Right),
+            ControllerEvent::Pressed(Buttons::Right) => self.move_space(Direction::Left),
+            ControllerEvent::Pressed(Buttons::Button2) => self.show_hint = true,
+            ControllerEvent::Released(Buttons::Button2) => self.show_hint = false,
+            _ => (),
+        }
+
+        return None;
+    }
+
+    fn render(&self) {
+        for i in 0..16 {
+            let x: i32 = 8 + (36 * (i % 4));
+            let y: i32 = 8 + (36 * (i / 4));
+            let value = self.get_value(i);
+            if value < 16 {
+                blit(TILES[(value - 1) as usize], x, y, 36, 36, BLIT_2BPP);
+                if self.show_hint {
+                    text(value.to_string(), x, y);
+                }
+            }
+        }
     }
 }
