@@ -79,7 +79,7 @@ const TILES: [&[u8]; 16] = [
 ];
 
 impl Scene for MainGameScene {
-    fn handle_input(&mut self, event: ControllerEvent) -> Option<Box<dyn Scene>> {
+    fn handle_input(&mut self, event: ControllerEvent) {
         match event {
             ControllerEvent::Pressed(Buttons::Up) => self.move_space(Direction::Down),
             ControllerEvent::Pressed(Buttons::Down) => self.move_space(Direction::Up),
@@ -89,11 +89,9 @@ impl Scene for MainGameScene {
             ControllerEvent::Released(Buttons::Button2) => self.show_hint = false,
             _ => (),
         }
-
-        return None;
     }
 
-    fn render(&self) {
+    fn render(&self) -> Option<Box<dyn Scene>> {
         for i in 0..16 {
             let x: i32 = 8 + (36 * (i % 4));
             let y: i32 = 8 + (36 * (i / 4));
@@ -105,5 +103,6 @@ impl Scene for MainGameScene {
                 }
             }
         }
+        return None;
     }
 }
