@@ -12,11 +12,14 @@ use gamestate::*;
 use input::*;
 use scene::*;
 
-use core::cell::RefCell;
+#[macro_use]
+extern crate lazy_static;
 
-thread_local!{
-    static SCENE: RefCell<MainGameScene> = RefCell::new(MainGameScene::new());
-    static CONTROLLER_STATE: RefCell<ControllerState> = RefCell::new(ControllerState::new());
+use std::sync::Mutex;
+
+lazy_static!{
+    static ref SCENE: Mutex<MainGameScene> = Mutex::new(MainGameScene::new());
+    static ref CONTROLLER_STATE: Mutex<ControllerState> = Mutex::new(ControllerState::new());
 }
 
 #[no_mangle]
@@ -25,21 +28,15 @@ fn update() {
 
     let mut controller_events: Vec<ControllerEvent> = Vec::<ControllerEvent>::new();
 
-    CONTROLLER_STATE.with(|state| {
+    let mut state = CONTROLLER_STATE.lock().expect("controller");
+    controller_events = state.get_event();
 
-        let mut state = state.borrow_mut();
+    let mut scene = SCENE.lock().expect("scene");
+    for event in controller_events {
+        scene.handle_input(event);
+    }
 
-        controller_events = state.get_event();
-    });
-
-    SCENE.with(|scene| {
-        let mut scene = scene.borrow_mut();
-        for event in controller_events {
-            scene.handle_input(event);
-        }
-
-        scene.render();
-    });
+    scene.render();
 }
 
 #[no_mangle]
