@@ -54,8 +54,8 @@ impl MainGameScene {
         }
 
         // swap old and new pos
-        let newIndex = y * 4 + x;
-        self.board.swap(index, newIndex);
+        let new_index = y * 4 + x;
+        self.board.swap(index, new_index);
     }
 }
 
@@ -91,7 +91,11 @@ impl Scene for MainGameScene {
         }
     }
 
-    fn render(&self) -> Option<Box<dyn Scene>> {
+    fn render(&mut self) -> Option<Box<dyn Scene>> {
+        unsafe {
+            *DRAW_COLORS = 0x1234;
+        }
+
         for i in 0..16 {
             let x: i32 = 8 + (36 * (i % 4));
             let y: i32 = 8 + (36 * (i / 4));

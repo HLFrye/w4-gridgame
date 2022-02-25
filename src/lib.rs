@@ -6,37 +6,26 @@ mod gamestate;
 mod drawing;
 mod input;
 mod scene;
+mod startupscene;
+mod gamerunner;
 
 use wasm4::*;
-use gamestate::*;
 use input::*;
-use scene::*;
+use gamerunner::*;
 
-#[macro_use]
-extern crate lazy_static;
+use core::cell::RefCell;
 
-use std::sync::Mutex;
-
-lazy_static!{
-    static ref SCENE: Mutex<MainGameScene> = Mutex::new(MainGameScene::new());
-    static ref CONTROLLER_STATE: Mutex<ControllerState> = Mutex::new(ControllerState::new());
+thread_local!{
+    static RUNNER: RefCell<GameRunner> = RefCell::new(GameRunner::new());
 }
 
 #[no_mangle]
 fn update() {
-    unsafe { *DRAW_COLORS = 0x1234 }
+    RUNNER.with(|runner_ref| {
+        let mut runner = runner_ref.borrow_mut();
+        runner.update();
+    });
 
-    let mut controller_events: Vec<ControllerEvent> = Vec::<ControllerEvent>::new();
-
-    let mut state = CONTROLLER_STATE.lock().expect("controller");
-    controller_events = state.get_event();
-
-    let mut scene = SCENE.lock().expect("scene");
-    for event in controller_events {
-        scene.handle_input(event);
-    }
-
-    scene.render();
 }
 
 #[no_mangle]
