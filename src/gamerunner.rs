@@ -3,6 +3,12 @@ use crate::startupscene::*;
 use crate::ControllerState;
 use crate::RefCell;
 
+// TODO: Implement the following scenes
+// Start screen
+// Choose level screen
+// High score screen
+// Add high score screen
+
 pub struct GameRunner {
     controller: ControllerState,
     scene: RefCell<Box<dyn Scene>>,
@@ -28,7 +34,7 @@ impl GameRunner {
 
             next_scene = scene.render();
         }
-        
+
         if let Some(new_scene) = next_scene {
             self.scene = RefCell::new(new_scene);
         }
