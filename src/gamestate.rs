@@ -5,7 +5,7 @@ use crate::input::*;
 use crate::ControllerEvent;
 
 fn generate_board() -> Vec<u8> {
-    return vec![2, 4, 9, 16, 6, 14, 11, 15, 8, 7, 5, 12, 13, 3, 10, 1];
+    return vec![9, 14, 6, 5, 1, 16, 4, 11, 13, 15, 7, 3, 8, 12, 2, 10];
 }
 
 #[derive(PartialEq)]
