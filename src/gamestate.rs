@@ -3,9 +3,60 @@ use crate::wasm4::*;
 use crate::scene::*;
 use crate::input::*;
 use crate::ControllerEvent;
+use fastrand::Rng;
+
+fn random_board() -> Vec<u8> {
+    let mut tiles = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+
+    let rng = Rng::with_seed(67);
+
+    let mut board = Vec::new();
+
+    for i in 0..16 {
+        let index = rng.usize(0..tiles.len()) as usize;
+        let tile = tiles[index];
+        tiles.remove(index);
+        board.push(tile);
+    }
+    return board;
+}
+
+fn count_inversions(board: &Vec<u8>) -> u32 {
+    let mut result = 0;
+    for i in 0..board.len() {
+        for j in i..board.len() {
+            if board[j] < board[i] {
+                result += 1;
+            }
+        }
+    }
+    return result;
+}
+
+fn distance(board: &Vec<u8>) -> u32 {
+    let board_pos = board.iter().position(|&x| x == 16).unwrap();
+    let board_x = board_pos % 4;
+    let board_y = board_pos / 4;
+
+    let dist = (3 - board_x) + (3 - board_y);
+    return dist as u32;
+}
 
 fn generate_board() -> Vec<u8> {
-    return vec![9, 14, 6, 5, 1, 16, 4, 11, 13, 15, 7, 3, 8, 12, 2, 10];
+    let mut board = random_board();
+    let dist = distance(&board);
+    let inversions = count_inversions(&board);
+
+    if (dist + inversions) % 2 == 1 {
+        let p1 = board.iter().position(|&x| x == 15).unwrap();
+        let p2 = board.iter().position(|&x| x == 14).unwrap();
+
+        let tmp = board[p1];
+        board[p1] = board[p2];
+        board[p2] = tmp;
+    }
+
+    return board;
 }
 
 #[derive(PartialEq)]
