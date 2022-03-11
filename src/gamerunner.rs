@@ -12,6 +12,7 @@ use crate::RefCell;
 pub struct GameRunner {
     controller: ControllerState,
     scene: RefCell<Box<dyn Scene>>,
+    frame_count: u32,
 }
 
 impl GameRunner {
@@ -19,10 +20,12 @@ impl GameRunner {
         GameRunner {
             controller: ControllerState::new(),
             scene: RefCell::new(Box::new(StartupScene::new())),
+            frame_count: 0,
         }
     }
 
     pub fn update(&mut self) {
+        self.frame_count = self.frame_count.wrapping_add(1);
         let controller_events = self.controller.get_event();
         let next_scene;
         {

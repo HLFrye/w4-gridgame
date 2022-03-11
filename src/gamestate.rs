@@ -13,7 +13,7 @@ fn random_board() -> Vec<u8> {
     let mut board = Vec::new();
 
     for i in 0..16 {
-        let index = rng.usize(0..tiles.len()) as usize;
+        let index = rng.usize(0..tiles.len());
         let tile = tiles[index];
         tiles.remove(index);
         board.push(tile);
