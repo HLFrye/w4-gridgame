@@ -35,7 +35,7 @@ impl GameRunner {
                 scene.handle_input(event);
             }
 
-            next_scene = scene.render();
+            next_scene = scene.render(self.frame_count);
         }
 
         if let Some(new_scene) = next_scene {

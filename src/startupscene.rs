@@ -1,7 +1,7 @@
 use crate::scene::*;
-use crate::gamestate::*;
 use crate::text;
 use crate::ControllerEvent;
+use crate::startscene::StartScene;
 
 pub struct StartupScene {
     elapsed: u32,
@@ -20,10 +20,10 @@ impl Scene for StartupScene {
         self.elapsed += 10;
     }
 
-    fn render(&mut self) -> Option<Box<dyn Scene>> {
+    fn render(&mut self, _framecount: u32) -> Option<Box<dyn Scene>> {
 
         if self.elapsed > 120 {
-            return Some(Box::new(MainGameScene::new()))
+            return Some(Box::new(StartScene::new()))
         }
 
         const YOFF: i32 = 24;

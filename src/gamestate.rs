@@ -5,14 +5,14 @@ use crate::input::*;
 use crate::ControllerEvent;
 use fastrand::Rng;
 
-fn random_board() -> Vec<u8> {
+fn random_board(seed: u32) -> Vec<u8> {
     let mut tiles = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
-    let rng = Rng::with_seed(67);
+    let rng = Rng::with_seed(seed.into());
 
     let mut board = Vec::new();
 
-    for i in 0..16 {
+    for _i in 0..16 {
         let index = rng.usize(0..tiles.len());
         let tile = tiles[index];
         tiles.remove(index);
@@ -42,8 +42,8 @@ fn distance(board: &Vec<u8>) -> u32 {
     return dist as u32;
 }
 
-fn generate_board() -> Vec<u8> {
-    let mut board = random_board();
+fn generate_board(seed: u32) -> Vec<u8> {
+    let mut board = random_board(seed);
     let dist = distance(&board);
     let inversions = count_inversions(&board);
 
@@ -77,9 +77,9 @@ pub struct MainGameScene {
 }
 
 impl MainGameScene {
-    pub fn new() -> MainGameScene {
+    pub fn new(seed: u32) -> MainGameScene {
         MainGameScene {
-            board: generate_board(),
+            board: generate_board(seed),
             move_count: 0,
             show_hint: false,
             frame: 0,
@@ -116,27 +116,9 @@ impl MainGameScene {
         self.frame = 1;
         self.moving = self.board[index];
         self.move_direction = dir;
+        self.move_count += 1;
     }
 }
-
-const TILES: [&[u8]; 16] = [
-    &tile1_bits,
-    &tile2_bits,
-    &tile3_bits,
-    &tile4_bits,
-    &tile5_bits,
-    &tile6_bits,
-    &tile7_bits,
-    &tile8_bits,
-    &tile9_bits,
-    &tile10_bits,
-    &tile11_bits,
-    &tile12_bits,
-    &tile13_bits,
-    &tile14_bits,
-    &tile15_bits,
-    &tile16_bits,
-];
 
 const SLIDE_FRAMES: i32 = 8;
 
@@ -153,12 +135,22 @@ impl Scene for MainGameScene {
         }
     }
 
-    fn render(&mut self) -> Option<Box<dyn Scene>> {
+    fn render(&mut self, _framecount: u32) -> Option<Box<dyn Scene>> {
         unsafe {
-            *DRAW_COLORS = 0x1234;
-        }
+            *DRAW_COLORS = 0x4321;
+            (*PALETTE)[0] = FRYE_SMALL_COLOR_PALETTE[0];
+            (*PALETTE)[1] = FRYE_SMALL_COLOR_PALETTE[1];
+            (*PALETTE)[2] = FRYE_SMALL_COLOR_PALETTE[2];
+            (*PALETTE)[3] = FRYE_SMALL_COLOR_PALETTE[3];
 
-        let empty_spot = self.board.iter().position(|&r| r == 16).unwrap();
+            // *PALETTE = [
+            //     0xfff6d3,
+            //     0xf9a875,
+            //     0xeb6b6f,
+            //     0x7c3f58,
+            // ];
+   
+        }
 
         for i in 0..16 {
             let mut x: i32 = 8 + (36 * (i % 4));
@@ -175,7 +167,7 @@ impl Scene for MainGameScene {
 
                     self.frame += 1;
                 }
-                blit(TILES[(value - 1) as usize], x, y, 36, 36, BLIT_2BPP);
+                blit(FRYE_SMALL_COLOR[(value - 1) as usize], x, y, 36, 36, BLIT_2BPP);
                 if self.show_hint {
                     text(value.to_string(), x, y);
                 }

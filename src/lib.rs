@@ -7,6 +7,7 @@ mod drawing;
 mod input;
 mod scene;
 mod startupscene;
+mod startscene;
 mod gamerunner;
 
 use wasm4::*;
