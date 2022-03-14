@@ -5,7 +5,7 @@ use crate::input::*;
 use crate::ControllerEvent;
 use fastrand::Rng;
 
-const MAX_SCORE: u32 = 10000;
+const MAX_SCORE: u32 = 5000;
 
 fn calculate_score(move_count: u32, frame_count: u32, hint_count: u32) -> u32 {
     let move_factor = move_count * 10;
@@ -13,6 +13,15 @@ fn calculate_score(move_count: u32, frame_count: u32, hint_count: u32) -> u32 {
     let hint_factor = hint_count / 60;
     
     return MAX_SCORE.saturating_sub(move_factor + time_factor + hint_factor);
+}
+
+fn board_solved(board: &Vec<u8>) -> bool {
+    for i in 0..16 {
+        if board[i] != (i + 1) {
+            return false;
+        }
+    }
+    return true;
 }
 
 fn random_board(seed: u32) -> Vec<u8> {
@@ -151,18 +160,6 @@ impl Scene for MainGameScene {
         unsafe {
             *DRAW_COLORS = 0x4321;
             *PALETTE = FRYE_SMALL_COLOR_PALETTE;
-            // (*PALETTE)[0] = FRYE_SMALL_COLOR_PALETTE[0];
-            // (*PALETTE)[1] = FRYE_SMALL_COLOR_PALETTE[1];
-            // (*PALETTE)[2] = FRYE_SMALL_COLOR_PALETTE[2];
-            // (*PALETTE)[3] = FRYE_SMALL_COLOR_PALETTE[3];
-
-            // *PALETTE = [
-            //     0xfff6d3,
-            //     0xf9a875,
-            //     0xeb6b6f,
-            //     0x7c3f58,
-            // ];
-   
         }
 
         if self.show_hint {
