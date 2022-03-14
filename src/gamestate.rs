@@ -5,6 +5,16 @@ use crate::input::*;
 use crate::ControllerEvent;
 use fastrand::Rng;
 
+const MAX_SCORE: u32 = 10000;
+
+fn calculate_score(move_count: u32, frame_count: u32, hint_count: u32) -> u32 {
+    let move_factor = move_count * 10;
+    let time_factor = frame_count / 60;
+    let hint_factor = hint_count / 60;
+    
+    return MAX_SCORE.saturating_sub(move_factor + time_factor + hint_factor);
+}
+
 fn random_board(seed: u32) -> Vec<u8> {
     let mut tiles = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
@@ -74,6 +84,7 @@ pub struct MainGameScene {
     frame: i32,
     moving: u8,
     move_direction: Direction,
+    hint_count: u32,
 }
 
 impl MainGameScene {
@@ -85,6 +96,7 @@ impl MainGameScene {
             frame: 0,
             moving: 0,
             move_direction: Direction::Up,
+            hint_count: 0,
         }
     }
 
@@ -135,13 +147,14 @@ impl Scene for MainGameScene {
         }
     }
 
-    fn render(&mut self, _framecount: u32) -> Option<Box<dyn Scene>> {
+    fn render(&mut self, framecount: u32) -> Option<Box<dyn Scene>> {
         unsafe {
             *DRAW_COLORS = 0x4321;
-            (*PALETTE)[0] = FRYE_SMALL_COLOR_PALETTE[0];
-            (*PALETTE)[1] = FRYE_SMALL_COLOR_PALETTE[1];
-            (*PALETTE)[2] = FRYE_SMALL_COLOR_PALETTE[2];
-            (*PALETTE)[3] = FRYE_SMALL_COLOR_PALETTE[3];
+            *PALETTE = FRYE_SMALL_COLOR_PALETTE;
+            // (*PALETTE)[0] = FRYE_SMALL_COLOR_PALETTE[0];
+            // (*PALETTE)[1] = FRYE_SMALL_COLOR_PALETTE[1];
+            // (*PALETTE)[2] = FRYE_SMALL_COLOR_PALETTE[2];
+            // (*PALETTE)[3] = FRYE_SMALL_COLOR_PALETTE[3];
 
             // *PALETTE = [
             //     0xfff6d3,
@@ -151,6 +164,16 @@ impl Scene for MainGameScene {
             // ];
    
         }
+
+        if self.show_hint {
+            self.hint_count += 1;
+        }
+
+        text("Move Count:", 30, 152);
+        text(self.move_count.to_string(), 118, 152);
+
+        text("Score: ", 40, 0);
+        text(calculate_score(self.move_count, framecount, self.hint_count).to_string(), 96, 0);
 
         for i in 0..16 {
             let mut x: i32 = 8 + (36 * (i % 4));
