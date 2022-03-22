@@ -1,8 +1,9 @@
 use crate::scene::*;
-use crate::gamestate::*;
 use crate::text;
 use crate::ControllerEvent;
 use crate::Buttons;
+use crate::highscorescene::*;
+use crate::maingamescene::MainGameScene;
 
 pub enum Choice {
     Start,
@@ -34,14 +35,19 @@ impl Scene for StartScene {
         match event {
             ControllerEvent::Released(Buttons::Up) if self.selected > 0 => self.selected -= 1,
             ControllerEvent::Released(Buttons::Down) if self.selected < CHOICES.len() => self.selected += 1,
-            ControllerEvent::Pressed(Buttons::Button1 | Buttons::Button2) => self.start_pressed = true,
+            ControllerEvent::Released(Buttons::Button1 | Buttons::Button2) => self.start_pressed = true,
             _ => (),
         }
     }
 
     fn render(&mut self, framecount: u32) -> Option<Box<dyn Scene>> {
         if self.start_pressed {
-            return Some(Box::new(MainGameScene::new(framecount)))
+            match CHOICES[self.selected] {
+                Choice::Start => return Some(Box::new(MainGameScene::new(framecount, 0))),
+                Choice::StageSelect => return Some(Box::new(MainGameScene::new(framecount, 0))),
+                Choice::HighScores => return Some(Box::new(HighScoreScene::new())),
+            }
+
         }
 
         for i in 0..CHOICES.len() {

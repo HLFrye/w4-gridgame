@@ -2,13 +2,16 @@
 mod alloc;
 mod wasm4;
 mod tiles;
-mod gamestate;
+mod boardutils;
+mod slidepuzzle;
+mod maingamescene;
 mod drawing;
 mod input;
 mod scene;
 mod startupscene;
 mod startscene;
 mod gamerunner;
+mod highscorescene;
 
 use wasm4::*;
 use input::*;
