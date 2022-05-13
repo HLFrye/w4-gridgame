@@ -1,22 +1,20 @@
 use fastrand::Rng;
 
-fn random_board(seed: u32) -> Vec<u8> {
-    let mut tiles = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-
+fn random_board(seed: u32) -> [u8; 16] {
     let rng = Rng::with_seed(seed.into());
+    let mut board = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-    let mut board = Vec::new();
-
-    for _i in 0..16 {
-        let index = rng.usize(0..tiles.len());
-        let tile = tiles[index];
-        tiles.remove(index);
-        board.push(tile);
+    for i in 1..16 {
+        let mut index = rng.usize(0..16);
+        while board[index] != 0 {
+            index = (index + 1) % 16;
+        }
+        board[index] = i;
     }
     return board;
 }
 
-fn count_inversions(board: &Vec<u8>) -> u32 {
+fn count_inversions(board: &[u8; 16]) -> u32 {
     let mut result = 0;
     for i in 0..board.len() {
         for j in i..board.len() {
@@ -28,7 +26,7 @@ fn count_inversions(board: &Vec<u8>) -> u32 {
     return result;
 }
 
-fn distance(board: &Vec<u8>) -> u32 {
+fn distance(board: &[u8; 16]) -> u32 {
     let board_pos = board.iter().position(|&x| x == 16).unwrap();
     let board_x = board_pos % 4;
     let board_y = board_pos / 4;
@@ -37,7 +35,7 @@ fn distance(board: &Vec<u8>) -> u32 {
     return dist as u32;
 }
 
-pub fn generate_board(seed: u32) -> Vec<u8> {
+pub fn generate_board(seed: u32) -> [u8; 16] {
     let mut board = random_board(seed);
     let dist = distance(&board);
     let inversions = count_inversions(&board);

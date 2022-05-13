@@ -1,68 +1,46 @@
 use crate::wasm4::*;
-use std::collections::HashSet;
-
-#[derive(Hash, std::cmp::Eq)]
-#[derive(PartialEq)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub enum Buttons {
-    Button1,
-    Button2,
-    Up,
-    Down,
-    Left,
-    Right,
-}
 
 pub enum ControllerEvent {
-    Pressed(Buttons),
-    Released(Buttons),
+    None,
+    Pressed(u8),
+    Released(u8),
 }
 
 pub struct ControllerState {
-    pressed: HashSet<Buttons>,
+    last: u8,
 }
 
 impl ControllerState {
     pub fn new() -> ControllerState {
-        return ControllerState {
-            pressed: HashSet::<Buttons>::new(),
-        };
+        return ControllerState { 
+            last: 0,
+        }
     }
 
-    pub fn get_event(&mut self) -> Vec<ControllerEvent> {
+    pub fn get_events(&mut self) -> [ControllerEvent; 8] {
         let gamepad = unsafe { *GAMEPAD1 };
-        let mut status = HashSet::<Buttons>::new();
-        
-        if gamepad & BUTTON_UP != 0 {
-            status.insert(Buttons::Up);
-        }
-        if gamepad & BUTTON_DOWN != 0 {
-            status.insert(Buttons::Down);
-        }
-        if gamepad & BUTTON_LEFT != 0 {
-            status.insert(Buttons::Left);
-        }
-        if gamepad & BUTTON_RIGHT != 0 {
-            status.insert(Buttons::Right);
-        }
-        if gamepad & BUTTON_1 != 0 {
-            status.insert(Buttons::Button1);
-        }
-        if gamepad & BUTTON_2 != 0 {
-            status.insert(Buttons::Button2);
-        }
 
-        let mut out = Vec::<ControllerEvent>::new();
-        for released in self.pressed.difference(&status) {
-            out.push(ControllerEvent::Released(*released));
-        }
-        for pressed in status.difference(&self.pressed) {
-            out.push(ControllerEvent::Pressed(*pressed));
-        }
+        let mut output = [
+            ControllerEvent::None, ControllerEvent::None, ControllerEvent::None, ControllerEvent::None, 
+            ControllerEvent::None, ControllerEvent::None, ControllerEvent::None, ControllerEvent::None,
+        ];
 
-        self.pressed = status;
+        for i in 0..8 {
+            let flag: u8 = 1 << i;
+            if (gamepad & flag) != 0 {
+                if (self.last & flag) == 0 {
+                    output[i] = ControllerEvent::Pressed(flag);
+                }
+            }
 
-        return out;
+            if (self.last & flag) != 0 {
+                if (gamepad & flag) == 0 {
+                    output[i] = ControllerEvent::Released(flag);
+                }
+            }
+        }
+        self.last = gamepad;
+
+        return output;
     }
 }

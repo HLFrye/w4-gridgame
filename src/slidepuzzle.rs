@@ -9,7 +9,7 @@ use crate::boardutils::*;
 // }
 
 pub struct SlidePuzzle {
-    board: Vec<u8>,
+    board: [u8; 16],
 }
 
 impl SlidePuzzle {

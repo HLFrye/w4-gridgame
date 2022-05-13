@@ -1,6 +1,6 @@
 use crate::scene::*;
 use crate::startupscene::*;
-use crate::ControllerState;
+use crate::input::*;
 use crate::RefCell;
 
 // TODO: Implement the following scenes
@@ -26,13 +26,16 @@ impl GameRunner {
 
     pub fn update(&mut self) {
         self.frame_count = self.frame_count.wrapping_add(1);
-        let controller_events = self.controller.get_event();
+        let controller_events = self.controller.get_events();
         let next_scene;
         {
             let mut scene = self.scene.borrow_mut();
 
-            for event in controller_events {
-                scene.handle_input(event);
+            for input in controller_events {
+                match input {
+                    ControllerEvent::None => (),
+                    x => scene.handle_input(x),
+                }
             }
 
             next_scene = scene.render(self.frame_count);

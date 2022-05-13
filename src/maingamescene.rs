@@ -3,7 +3,6 @@ use crate::slidepuzzle::SlidePuzzle;
 use crate::tiles::ALL_LEVELS;
 use crate::scene::Scene;
 use crate::ControllerEvent;
-use crate::Buttons;
 use crate::startupscene::StartupScene;
 
 const MAX_SCORE: u32 = 5000;
@@ -91,15 +90,15 @@ impl MainGameScene {
 const SLIDE_FRAMES: i32 = 8;
 
 impl Scene for MainGameScene {
-    fn handle_input(&mut self, event: ControllerEvent) {
+    fn handle_input<'a>(&mut self, event: ControllerEvent) {
         match event {
-            ControllerEvent::Pressed(Buttons::Up) => self.move_space(Direction::Down),
-            ControllerEvent::Pressed(Buttons::Down) => self.move_space(Direction::Up),
-            ControllerEvent::Pressed(Buttons::Left) => self.move_space(Direction::Right),
-            ControllerEvent::Pressed(Buttons::Right) => self.move_space(Direction::Left),
-            ControllerEvent::Pressed(Buttons::Button2) => self.show_hint = true,
-            ControllerEvent::Released(Buttons::Button2) => self.show_hint = false,
-            ControllerEvent::Released(Buttons::Button1) if self.game_over => self.done = true,
+            ControllerEvent::Pressed(BUTTON_UP) => self.move_space(Direction::Down),
+            ControllerEvent::Pressed(BUTTON_DOWN) => self.move_space(Direction::Up),
+            ControllerEvent::Pressed(BUTTON_RIGHT) => self.move_space(Direction::Right),
+            ControllerEvent::Pressed(BUTTON_LEFT) => self.move_space(Direction::Left),
+            ControllerEvent::Pressed(BUTTON_2) => self.show_hint = true,
+            ControllerEvent::Released(BUTTON_2) => self.show_hint = false,
+            ControllerEvent::Released(BUTTON_1) if self.game_over => self.done = true,
             _ => (),
         }
     }

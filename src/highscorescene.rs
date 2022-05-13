@@ -32,7 +32,7 @@ impl HighScoreScene {
 }
 
 impl Scene for HighScoreScene {
-    fn handle_input(&mut self, _event: ControllerEvent) {
+    fn handle_input<'a>(&mut self, _event: ControllerEvent) {
         self.done = true;
     }
 

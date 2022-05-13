@@ -1,9 +1,9 @@
 use crate::scene::*;
 use crate::text;
 use crate::ControllerEvent;
-use crate::Buttons;
 use crate::highscorescene::*;
 use crate::maingamescene::MainGameScene;
+use crate::wasm4;
 
 pub enum Choice {
     Start,
@@ -31,11 +31,11 @@ impl StartScene {
 }
 
 impl Scene for StartScene {
-    fn handle_input(&mut self, event: ControllerEvent) {
+    fn handle_input<'a>(&mut self, event: ControllerEvent) {
         match event {
-            ControllerEvent::Released(Buttons::Up) if self.selected > 0 => self.selected -= 1,
-            ControllerEvent::Released(Buttons::Down) if self.selected < CHOICES.len() => self.selected += 1,
-            ControllerEvent::Released(Buttons::Button1 | Buttons::Button2) => self.start_pressed = true,
+            ControllerEvent::Released(wasm4::BUTTON_UP) if self.selected > 0 => self.selected -= 1,
+            ControllerEvent::Released(wasm4::BUTTON_DOWN) if self.selected < CHOICES.len() => self.selected += 1,
+            ControllerEvent::Released(wasm4::BUTTON_1) | ControllerEvent::Released(wasm4::BUTTON_2) => self.start_pressed = true,
             _ => (),
         }
     }

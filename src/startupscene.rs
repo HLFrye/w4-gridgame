@@ -16,7 +16,7 @@ impl StartupScene {
 }
 
 impl Scene for StartupScene {
-    fn handle_input(&mut self, _event: ControllerEvent) {
+    fn handle_input<'a>(&mut self, _event: ControllerEvent) {
         self.elapsed += 10;
     }
 
